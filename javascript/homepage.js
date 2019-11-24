@@ -6,7 +6,9 @@ const clock = new THREE.Clock();
 
 //custom global vars
 let cube;
-let projector, mouse = { x: 0, y: 0 }, INTERSECTED;
+let glow1, glow2, glow3, raycaster;
+let projector, INTERSECTED;
+let mouse = new THREE.Vector2();
 
 //FUNCTIONS
 function init()  {
@@ -94,6 +96,8 @@ function createCube()   {
 
 }
 
+//add them to an array in for loop, stoopid
+
 function createBubbles()    {
 
     this.refractSphereCamera1 = new THREE.CubeCamera( 0.1, 5000, 512 );
@@ -173,40 +177,92 @@ function createBubbles()    {
     refractSphereCamera2.position = sphere2.position;
     refractSphereCamera3.position = sphere3.position;
 
+    let glowMaterial = new THREE.ShaderMaterial(
+        {
+            uniforms:
+            {
+                "c":    { type: "f", value: 1.0 },
+                "p":    { type: "f", value: 1.4 },
+                glowColor: { type: "c", value: new THREE.Color(0x8f2fd2) },
+                viewVector: { type: "v3", value: camera.position }
+            },
+            vertexShader: document.getElementById( 'vertexShader' ).textContent,
+            fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+            side: THREE.FrontSide,
+            blending: THREE.AdditiveBlending,
+            transparent: true
+        }
+    );
+    
+    glow1 = new THREE.Mesh( sphereGeometry1.clone(), glowMaterial.clone() );
+    glow1.position.set(-80, 30, 0);
+    glow1.scale.multiplyScalar(1.2);
+    glow1.visible = false;
+    scene.add( glow1 );
+    
+    glow2 = new THREE.Mesh( sphereGeometry1.clone(), glowMaterial.clone() );
+    glow2.position.set(80, 30, 0);
+    glow2.scale.multiplyScalar(1.2);    
+    glow2.visible = false;
+    scene.add( glow2 );
+
+    glow3 = new THREE.Mesh( sphereGeometry1.clone(), glowMaterial.clone() );
+    glow3.position.set(0, 110, 0);
+    glow3.scale.multiplyScalar(1.2);
+    glow3.visible = false;
+    scene.add( glow3 );
+
+    raycaster = new THREE.Raycaster();
+
 }
+
+
 
 function animate()  {
 
     requestAnimationFrame( animate );
     render();
-    //update();
+    update();
 
 }
 
 function update()   {
 
-    let vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
-    projector.unprojectVector( vector, camera );
-    let ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+    raycaster.setFromCamera( mouse, camera );
 
-    let intersects = ray.intersectObjects( scene.children );
+    let intersects = raycaster.intersectObjects( scene.children );
 
-    if( intersects.length > 0 )
+    if( intersects.length > 1 )
     {
-        if( intersects[ 0 ].object != INTERSECTED )
+        console.log("Something is intersected here");
+        if( intersects[ 0 ].object == sphere1 )
         {
-            if( INTERSECTED )
-                //change the color or do something
-            INTERSECTED = intersects[ 0 ].object;
-            //store for later
-            //do something
+            glow1.visible = true;
+            glow2.visible = false;
+            glow3.visible = false;
+            console.log("INTERSECTION");
+        }
+        if( intersects[ 0 ].object == sphere2 )
+        {
+            glow1.visible = false;
+            glow2.visible = true;
+            glow3.visible = false;
+            console.log("INTERSECTION");
+
+        }
+        if( intersects[ 0 ].object == sphere3 )
+        {
+            glow1.visible = false;
+            glow2.visible = false;
+            glow3.visible = true;
+            console.log("INTERSECTION");
         }
     }
     else
     {
-        if( INTERSECTED )
-            //change back
-        INTERSECTED = null;
+        glow1.visible = false;
+        glow2.visible = false;
+        glow3.visible = false;
     }
 
     controls.update();
@@ -237,7 +293,7 @@ function onWindowResize()  {
 
 function onDocumentMouseMove( event )   {
 
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.x = (event.clientX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 }
