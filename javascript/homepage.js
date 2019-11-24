@@ -24,6 +24,8 @@ function init()  {
     createLights();
     //CUBE
     createCube();
+    //BUBBLES 
+    createBubbles();
 
 }
 
@@ -91,10 +93,52 @@ function createCube()   {
 
 }
 
+function createBubbles()    {
+
+    this.refractSphereCamera = new THREE.CubeCamera( 0.1, 5000, 512 );
+    scene.add( refractSphereCamera );
+
+    let fShader = THREE.FresnelShader;
+
+    let fresnelUniforms =
+    {
+        "mRefractionRation":    { type: "f", value: 1.02 },
+        "mFresnelBias":         { type: "f", value: 0.1  },
+        "mFresnelPower":        { type: "f", value: 2.0  },
+        "mFresnelScale":        { type: "f", value: 1.0  },
+        "tCube":                { type: "f", value: refractSphereCamera.renderTarget }
+    };
+
+    let customMaterial = new THREE.ShaderMaterial(
+        {
+            uniforms:       fresnelUniforms,
+            vertexShader:   fShader.vertexShader,
+            fragmentShader: fShader.fragmentShader
+        }
+    );
+
+    let sphereGeometry = new THREE.SphereGeometry( 100, 64, 32 );
+    this.sphere = new THREE.Mesh( sphereGeometry, customMaterial );
+    sphere.position.set(0, 50, 100);
+    scene.add(sphere);
+
+    refractSphereCamera.position = sphere.position;
+
+
+}
+
 function animate()  {
 
-    renderer.render( scene, camera );
     requestAnimationFrame( animate );
+    render();
+}
+
+function render()   {
+    sphere.visible = false;
+    refractSphereCamera.updateCubeMap( renderer, scene );
+    sphere.visible = true;
+
+    renderer.render( scene, camera );
 }
 
 function onWindowResize()  {
