@@ -10,6 +10,13 @@ let glow1, glow2, glow3, raycaster;
 let projector, INTERSECTED;
 let mouse = new THREE.Vector2();
 
+//EVENTS 
+window.addEventListener( 'resize', onWindowResize );
+window.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+init();
+animate();
+
 //FUNCTIONS
 function init()  {
 
@@ -29,6 +36,8 @@ function init()  {
     createCube();
     //BUBBLES 
     createBubbles();
+    //TEXT
+    addText();
 
 }
 
@@ -163,12 +172,14 @@ function createBubbles()    {
     let sphereGeometry1 = new THREE.SphereGeometry( 50, 64, 32 );
     let sphereGeometry2 = new THREE.SphereGeometry( 50, 64, 32 );
     let sphereGeometry3 = new THREE.SphereGeometry( 50, 64, 32 );
+
     this.sphere1 = new THREE.Mesh( sphereGeometry1, customMaterial1 );
     sphere1.position.set(-80, 30, 0);
     this.sphere2 = new THREE.Mesh( sphereGeometry2, customMaterial2 );
     sphere2.position.set(80, 30, 0);
     this.sphere3 = new THREE.Mesh( sphereGeometry3, customMaterial3 );
     sphere3.position.set(0, 110, 0);
+
     scene.add(sphere1);
     scene.add(sphere2);
     scene.add(sphere3);
@@ -216,7 +227,9 @@ function createBubbles()    {
 
 }
 
+function addText()  {
 
+}
 
 function animate()  {
 
@@ -234,28 +247,31 @@ function update()   {
 
     if( intersects.length > 1 )
     {
-        console.log("Something is intersected here");
+        /*
+            TO DO!!!!
+        */
+
+        //create function calls for intersections, arg will be num
+        //will set the glow, project the texture, and make the words appear
+        //capture textures as screenshots of the webpages once they're built out a little
+
         if( intersects[ 0 ].object == sphere1 )
         {
             glow1.visible = true;
             glow2.visible = false;
             glow3.visible = false;
-            console.log("INTERSECTION");
         }
         if( intersects[ 0 ].object == sphere2 )
         {
             glow1.visible = false;
             glow2.visible = true;
             glow3.visible = false;
-            console.log("INTERSECTION");
-
         }
         if( intersects[ 0 ].object == sphere3 )
         {
             glow1.visible = false;
             glow2.visible = false;
             glow3.visible = true;
-            console.log("INTERSECTION");
         }
     }
     else
@@ -297,13 +313,6 @@ function onDocumentMouseMove( event )   {
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 }
-
-//EVENTS 
-window.addEventListener( 'resize', onWindowResize );
-window.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-init();
-animate();
 
 
 
