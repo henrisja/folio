@@ -7,6 +7,7 @@ const clock = new THREE.Clock();
 //custom global vars
 let cube;
 let glow1, glow2, glow3, raycaster;
+let aboutText, projectText, linksText;
 let projector, INTERSECTED;
 let mouse = new THREE.Vector2();
 
@@ -228,6 +229,17 @@ function createBubbles()    {
 }
 
 function addText()  {
+
+    let loader = new THREE.FontLoader();
+
+    loader.load( '../fonts/CubicRegular.json', function ( font ){
+        let geometry = new THREE.TextGeometry( 'ABOUT ME',{
+            font: font,
+            size: 80,
+            height: 5
+
+        });
+    });
 
 }
 
